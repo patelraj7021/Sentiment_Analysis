@@ -12,6 +12,10 @@ BOT_NAME = "sentiment_analysis"
 SPIDER_MODULES = ["sentiment_analysis.spiders"]
 NEWSPIDER_MODULE = "sentiment_analysis.spiders"
 
+DOWNLOAD_HANDLERS = {
+        "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "sentiment_analysis (+http://www.yourdomain.com)"
