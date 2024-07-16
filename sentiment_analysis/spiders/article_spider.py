@@ -21,4 +21,13 @@ class ArticleSpider(scrapy.Spider):
     def parse(self, response):
         ticker_name = response.url.split("/")[-1]
         filename = f"articles-{ticker_name}.html"
-        Path(filename).write_bytes(response.body)
+        recent_news_section = response \
+            .xpath('//section[@data-testid="storyitem"]/a/@href') \
+                .get(default='not_found')
+        print('********************')
+        print('********************')
+        print('********************')
+        print(recent_news_section)
+        print('********************')
+        print('********************')
+        print('********************')
