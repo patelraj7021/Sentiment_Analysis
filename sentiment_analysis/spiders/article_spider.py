@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jul 10 20:10:38 2024
+Created on Wed Jul 24 17:16:26 2024
 
 @author: patel
 """
 
 import scrapy
-from pathlib import Path
+
 
 
 class ArticleSpider(scrapy.Spider):
-    name = 'articles'
-        
+    name = 'article'
+    
     
     def start_requests(self):
         url = "https://finance.yahoo.com/quote/NVDA/"
@@ -19,15 +19,7 @@ class ArticleSpider(scrapy.Spider):
     
         
     def parse(self, response):
-        ticker_name = response.url.split("/")[-1]
-        filename = f"articles-{ticker_name}.html"
-        recent_news_section = response \
-            .xpath('//section[@data-testid="storyitem"]/a/@href') \
-                .get(default='not_found')
-        print('********************')
-        print('********************')
-        print('********************')
-        print(recent_news_section)
-        print('********************')
-        print('********************')
-        print('********************')
+        # get continue reading link if it exists
+        continue_link = response. \
+            xpath('//div[@class="caas-readmore caas-readmore-collapse"] \
+                  /a/@href')
