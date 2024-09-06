@@ -10,6 +10,7 @@ import scrapy
 
 
 class LinksSpider(scrapy.Spider):
+    # crawl through Yahoo main ticker page to get links for recent articles
     name = 'links'
         
     
@@ -19,8 +20,7 @@ class LinksSpider(scrapy.Spider):
     
     def start_requests(self):
         yield scrapy.Request(self.start_url, meta={'playwright': True})
-    
-        
+           
     def parse(self, response):
         # get links
         recent_news_links = response \

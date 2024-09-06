@@ -14,5 +14,12 @@ from spiders.article_spider import ArticleSpider
 
 
 process = CrawlerProcess(get_project_settings())
+
 process.crawl('links', url_in='https://finance.yahoo.com/quote/NVDA/')
+
+recent_news_links = open('links.log').read().splitlines()
+for link in recent_news_links:
+    process.crawl('article', url_in=link)
+   
 process.start()
+    
