@@ -6,8 +6,8 @@ Created on Wed Jul 24 17:16:26 2024
 """
 
 import scrapy
-
-
+import re
+import os
 
 class ArticleSpider(scrapy.Spider):
     # crawl through articles to get text
@@ -22,14 +22,16 @@ class ArticleSpider(scrapy.Spider):
         yield scrapy.Request(self.start_url, meta={'playwright': True})
         
     def parse(self, response):
-        # get continue reading link if it exists
-        title = response \
-            .xpath('//h1[@data-test-locator="headline"]/text()').getall()
-        with open('debug.log', 'a') as file:
-            file.write(title[0] + '\n')
-        # continue_link = response. \
-        #     xpath('//div[@class="caas-readmore caas-readmore-collapse"] \
-        #           /a/@href').get()
-        # if continue_link is not None:
-        #     with open('debug.log', 'a') as file:
-        #         file.write('continue_link')
+        # get title
+        title = response.xpath(
+            '//h1[@data-test-locator="headline"]/text()').get()
+        title = re.sub(r'\W+', '', title)
+        title = re.sub('\s+', '_', title)
+        # get text
+        text = response.xpath(
+            '//div[@class="caas-body"]//text()').extract()
+        text_filepath = os.path.join('article_temp_files', title + '.log')
+        with open(text_filepath, 'a') as file:
+            for p in text:
+                file.write(p + '\n')
+            

@@ -95,3 +95,11 @@ ROBOTSTXT_OBEY = True
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+def should_abort_request(request):
+    return (
+        request.resource_type == "image" 
+	or request.resource_type == "media"
+    )
+
+PLAYWRIGHT_ABORT_REQUEST = should_abort_request
