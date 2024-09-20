@@ -7,17 +7,21 @@ Created on Wed Sep 18 23:07:07 2024
 
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import os
-import torch as pt
 
     
-def embed_sequences(input_seqs, pretrained_name):
+def embed_sequences(input_seqs):
+    
     # initialize transformer
-    tokenizer = DistilBertTokenizer.from_pretrained(pretrained_name)
-    model = DistilBertForSequenceClassification.from_pretrained(
-        pretrained_name, output_hidden_states=True)
+    pretrained_name = "distilbert-base-uncased-finetuned-sst-2-english"
+    tokenizer = DistilBertTokenizer.from_pretrained(pretrained_name,
+                                                    clean_up_tokenization_spaces=True)
+    model = DistilBertForSequenceClassification.from_pretrained(pretrained_name, 
+                                                                output_hidden_states=True)
+    
     # tokenize
     sequences = tokenizer(input_seqs, padding='longest', truncation=True,
-                       return_tensors = 'pt')
+                          return_tensors = 'pt')
+    
     # embed
     model_out = model(**sequences)
     embeddings = model_out.hidden_states[-1]
@@ -27,39 +31,25 @@ def embed_sequences(input_seqs, pretrained_name):
 
 if __name__ == '__main__':
     
-    pretrained = "distilbert-base-uncased-finetuned-sst-2-english"
+    
     
     test_file = os.listdir('article_temp_files')[0]
     with open(os.path.join('article_temp_files', test_file), 'r') as file:
         text = file.read().split('.')
         
         
-    sequences, model_output, embeddings = embed_sequences(text, pretrained) 
-
-    # use CLS of each sequence as a summary of the sentiment of that sentence
+    sequences, model_output, embeddings = embed_sequences(text) 
     
     
     # bag of positive sentiment words to compare against
-    pos_words = ['I have positive feelings about this.',
-                 'I am optimistic.',
-                 'I suggest this.', 
-                 'This is a good idea.',
-                 'The bird flew over the tree.']
-    pos_sequences, pos_model, pos_embeddings = embed_sequences(pos_words,
-                                                               pretrained)
+    pos_words = ['positive',
+                 'optimistic',
+                 'hopeful'
+                 ]
+    pos_sequences, pos_model, pos_embeddings = embed_sequences(pos_words)
     
     # bag of negative sentiment words
-    neg_words = ['I have negative feelings about this.',  
-                 'I am pessimistic.',
-                 'Do not do this.',
-                 'This is a bad idea.',
-                 'Do you want to do this?']
-    neg_sequenecs, neg_model, neg_embeddings = embed_sequences(neg_words,
-                                                               pretrained)
-    
-
-    for i in range(len(pos_words)):
-        print(pt.dot(pos_embeddings[0, 0, :], pos_embeddings[i, 0, :]))
-        
-    for i in range(len(pos_words)):
-        print(pt.dot(pos_embeddings[0, 0, :], neg_embeddings[i, 0, :]))
+    neg_words = ['negative',  
+                 'pessimistic',
+                 'cautious']
+    neg_sequences, neg_model, neg_embeddings = embed_sequences(neg_words)
