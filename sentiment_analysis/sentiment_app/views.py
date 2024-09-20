@@ -11,3 +11,6 @@ def main(request):
 class AnalysisView(generics.CreateAPIView):
     queryset = Analysis.objects.all()
     serializer_class = AnalysisSerializer
+
+def index(request, *arg, **kwargs):
+    return render(request, 'frontend/index.html')
