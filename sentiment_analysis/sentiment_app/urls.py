@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('hello/', views.say_hello)
+    path('', views.main),
+    path('past_entries', views.AnalysisView.as_view())
 ]
