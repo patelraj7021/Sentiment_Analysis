@@ -5,7 +5,7 @@ Created on Wed Sep 18 23:07:07 2024
 @author: patel
 """
 
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification 
 import os
 import torch as pt
 import numpy as np
