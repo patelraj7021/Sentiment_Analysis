@@ -7,13 +7,13 @@ With a wealth of news articles available for frequently traded stocks though, it
 
 This project aims to address this issue by automating the market research and analysis pipeline for retail investors.
 Advances in large language model (LLM) architectures in recent years have enabled precise and context-informed quantifications of text, allowing for the sentiment of an article to be well understood by a machine.
-Thanks to the availability of pretrained transformer models, 
+Thanks to the availability of pretrained transformer models, this sort of analysis is possible for personal computers. 
 
 ### Methodology
 Note: this project is still under development and the sections below are only a short summary. 
 Further details will be included as development continues.
 
-#### Web Scraping
+#### Web Scraping / Data Collection
 Yahoo Finance provides news aggregation for a given stock, making it a readily accessible source of articles to use for sentiment analysis.
 This project uses the Python web scraping framework Scrapy to extract article text from the "Recent News" section of a stock page on Yahoo Finance.
 The text is processed and separated into sentence-long context windows for the sentiment analysis itself.
