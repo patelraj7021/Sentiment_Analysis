@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
+import Summary from "./Summary";
+import SearchBar from "./SearchBar";
 
 
 export default class App extends Component {
@@ -8,7 +10,12 @@ export default class App extends Component {
     }
 
     render () {
-        return <h1>Testing React</h1>;
+        return (
+            <div>
+                <Summary />
+                <SearchBar />
+            </div>   
+        );
     }
 }
 
