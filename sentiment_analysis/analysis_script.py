@@ -9,10 +9,10 @@ from transformers import DistilBertTokenizer, DistilBertForSequenceClassificatio
 import os
 import torch as pt
 import numpy as np
+from crawl_script import crawl_ticker
 
     
-def embed_sequences(input_seqs):
-    
+def embed_sequences(input_seqs):   
     # initialize transformer
     pretrained_name = "distilbert-base-uncased-finetuned-sst-2-english"
     tokenizer = DistilBertTokenizer.from_pretrained(pretrained_name,
@@ -29,20 +29,9 @@ def embed_sequences(input_seqs):
     embeddings = model_out.hidden_states[-1]
     
     return sequences, model_out, embeddings
-    
 
-if __name__ == '__main__':
-    
-    
-    
-    test_file = os.listdir('article_temp_files')[1]
-    with open(os.path.join('article_temp_files', test_file), 'r') as file:
-        text = file.read().split('.')
-        
-        
-    sequences, model_output, embeddings = embed_sequences(text) 
-    
-    
+
+def compare_text(embeddings):
     # bag of positive sentiment words to compare against
     pos_words = ['positive',
                  'optimistic',
@@ -54,18 +43,65 @@ if __name__ == '__main__':
                  'pessimistic',
                  'cautious']
     neg_sequences, neg_model, neg_embeddings = embed_sequences(neg_words)
-    
-    
+
     num_sentences = embeddings.shape[0]
     num_comp_words = pos_embeddings.shape[0]
-    pos_comps = []
-    neg_comps = []
-    for i in range(num_sentences):       
+
+    # create array of self comps for each word
+    # needed to calculate score later
+    pos_self_comps = []
+    neg_self_comps = []
+    for i in range(num_comp_words):
+        pos_self_comps.append(pt.dot(pos_embeddings[i, 0, :], pos_embeddings[i, 0, :]).item())
+        neg_self_comps.append(pt.dot(neg_embeddings[i, 0, :], neg_embeddings[i, 0, :]).item())
+
+    pos_scores = []
+    neg_scores = []
+    # compare each sentence with each pos / neg word
+    # save the mean of dot products of sentence with each pos / neg word
+    for i in range(num_sentences):
+        pos_scores_sentence = []
+        neg_scores_sentence = []        
         for j in range(num_comp_words):
-            pos_comps.append(pt.dot(embeddings[i, 0, :], pos_embeddings[j, 0, :]).item())
-            neg_comps.append(pt.dot(embeddings[i, 0, :], neg_embeddings[j, 0, :]).item())
-    print(np.mean(pos_comps))
-    print(np.mean(neg_comps))
-    print(np.median(pos_comps))
-    print(np.median(neg_comps))
-    
+            pos_self_comp = pos_self_comps[j]
+            neg_self_comp = neg_self_comps[j]
+            pos_sent_comp = pt.dot(embeddings[i, 0, :], pos_embeddings[j, 0, :]).item()
+            neg_sent_comp = pt.dot(embeddings[i, 0, :], neg_embeddings[j, 0, :]).item()
+            # comparison score is relative to highest possible for a word
+            # highest possible is word dot product with itself
+            # lowest allowed score is 0
+            pos_score = max(int((pos_sent_comp / pos_self_comp)*100), 0)
+            neg_score = max(int((neg_sent_comp / neg_self_comp)*100), 0)
+            pos_scores_sentence.append(pos_score)
+            neg_scores_sentence.append(neg_score)
+        pos_scores.append(np.mean(pos_scores_sentence))
+        neg_scores.append(np.mean(neg_scores_sentence))
+
+    # return mean of pos and neg scores
+    return np.mean(pos_scores), np.mean(neg_scores)
+
+
+def analyze_ticker(data_filepath):
+    ticker_pos_scores = []
+    ticker_neg_scores = []
+    ticker_pos_neg_fracs = []
+    # analyze each article file and save its pos and neg scores
+    for data_file in os.listdir(data_filepath):
+        with open(os.path.join(data_filepath, data_file), 'r') as file:
+            text = file.read().split('.')
+            sequences, model_output, embeddings = embed_sequences(text)
+            article_pos_score, article_neg_score = compare_text(embeddings)
+            ticker_pos_scores.append(int(article_pos_score))
+            ticker_neg_scores.append(int(article_neg_score))
+            ticker_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
+            ticker_pos_neg_fracs.append(ticker_pos_neg_frac)
+
+    return ticker_pos_scores, ticker_neg_scores, ticker_pos_neg_fracs
+
+
+def analysis_wrapper(ticker):
+    # web scraping
+    data_filepath = crawl_ticker(ticker)
+    # analysis 
+    result = analyze_ticker(data_filepath)
+    return result

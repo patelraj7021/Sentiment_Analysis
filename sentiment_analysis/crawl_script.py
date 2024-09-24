@@ -12,19 +12,20 @@ import os
 
 
 def crawl_ticker(ticker):
+    # call spider and return filepath where article text is stored
     
     # delete log folder from previous code executions
     # create folder
-    temp_filepath = os.path.join(os.getcwd(), 'article_temp_files')
-    if os.path.exists(temp_filepath):
-        shutil.rmtree(temp_filepath)
-    os.makedirs(temp_filepath)
+    data_filepath = os.path.join(os.getcwd(), 'article_temp_files')
+    if os.path.exists(data_filepath):
+        shutil.rmtree(data_filepath)
+    os.makedirs(data_filepath)
 
+    # call spider
+    yahoo_finance_url = 'https://finance.yahoo.com/quote/'
     process = CrawlerProcess(get_project_settings())   
     process.crawl('article_text', 
-                  url_in='https://finance.yahoo.com/quote/' + \
-                      ticker.upper() + '/')       
+                  url_in=yahoo_finance_url + ticker.upper() + '/')       
     process.start()
-    return 
-    
 
+    return data_filepath

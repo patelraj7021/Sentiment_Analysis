@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = [
     # path('', views.main),
-    path('past_entries', views.AnalysisView.as_view()),
+    path('past-entries', views.AnalysisView.as_view()),
     path('', views.index)
 ]
