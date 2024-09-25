@@ -23,6 +23,8 @@
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-transform-class-properties": "^7.25.4",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.1",
     "react-router-dom": "^6.26.2"

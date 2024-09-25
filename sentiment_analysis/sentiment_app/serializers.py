@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from .models import Analysis
+from .models import Summaries, Articles
 
 
-class AnalysisSerializer(serializers.ModelSerializer):
+class SummariesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Analysis
-        fields = ('id', 'ticker', 'date', 'pos_sentiment', 'neg_sentiment')
+        model = Summaries
+        fields = ['id', 'ticker', 'date', 'overall_rating']
+        
+        
+class AnalyzeRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Summaries
+        fields = ['ticker']
