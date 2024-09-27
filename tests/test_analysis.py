@@ -10,8 +10,9 @@ import os
 import pytest
 sys.path.append(os.path.dirname(os.getcwd()))
 from sentiment_analysis import analysis_module as a_m
-import torch as pt
 import numpy as np
+from torch.nn.functional import normalize
+import torch as pt
 
 
 
@@ -45,7 +46,9 @@ def dot_product_identity_comparison(embeddings):
     for i in range(num_words):
         prods_list = []
         for j in range(num_words):
-            prod = pt.dot(embeddings[i, 0, :], embeddings[j, 0, :]).item()
+            norm_i_embedding = normalize(embeddings[i, 0, :], dim=0)
+            norm_j_embedding = normalize(embeddings[j, 0, :], dim=0)
+            prod = pt.dot(norm_i_embedding, norm_j_embedding).item()
             prods_list.append(prod)
         if np.argmax(prods_list) != i:
             result = False
@@ -60,8 +63,11 @@ def dot_product_differing_comparision(embeddings_same, embeddings_different):
         pos_prods = []
         neg_prods = []
         for j in range(num_words):
-            neg_prod = pt.dot(embeddings_same[i, 0, :], embeddings_different[j, 0, :]).item()
-            pos_prod = pt.dot(embeddings_same[i, 0, :], embeddings_same[j, 0, :]).item()
+            norm_same_embedding_i = normalize(embeddings_same[i, 0, :], dim=0)
+            norm_same_embedding_j = normalize(embeddings_same[j, 0, :], dim=0)
+            norm_different_embedding = normalize(embeddings_different[j, 0, :], dim=0)
+            neg_prod = pt.dot(norm_same_embedding_i, norm_different_embedding).item()
+            pos_prod = pt.dot(norm_same_embedding_i, norm_same_embedding_j).item()
             pos_prods.append(pos_prod)
             neg_prods.append(neg_prod)
         if max(neg_prods) >= min(pos_prods):

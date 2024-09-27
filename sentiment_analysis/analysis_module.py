@@ -8,6 +8,7 @@ Created on Wed Sep 18 23:07:07 2024
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification 
 import os
 import torch as pt
+from torch.nn.functional import normalize
 import numpy as np
 from .crawl_module import crawl_ticker
 
@@ -47,14 +48,6 @@ def compare_text(embeddings):
     num_sentences = embeddings.shape[0]
     num_comp_words = pos_embeddings.shape[0]
 
-    # create array of self comps for each word
-    # needed to calculate score later
-    pos_self_comps = []
-    neg_self_comps = []
-    for i in range(num_comp_words):
-        pos_self_comps.append(pt.dot(pos_embeddings[i, 0, :], pos_embeddings[i, 0, :]).item())
-        neg_self_comps.append(pt.dot(neg_embeddings[i, 0, :], neg_embeddings[i, 0, :]).item())
-
     pos_scores = []
     neg_scores = []
     # compare each sentence with each pos / neg word
@@ -63,21 +56,23 @@ def compare_text(embeddings):
         pos_scores_sentence = []
         neg_scores_sentence = []        
         for j in range(num_comp_words):
-            pos_self_comp = pos_self_comps[j]
-            neg_self_comp = neg_self_comps[j]
-            pos_sent_comp = pt.dot(embeddings[i, 0, :], pos_embeddings[j, 0, :]).item()
-            neg_sent_comp = pt.dot(embeddings[i, 0, :], neg_embeddings[j, 0, :]).item()
+            # normalize all vectors so only direction is used for comparison
+            norm_pos_embedding = normalize(pos_embeddings[j, 0, :])
+            norm_neg_embedding = normalize(neg_embeddings[j, 0, :])
+            norm_sent_embedding = normalize(embeddings[j, 0, :])
             # comparison score is relative to highest possible for a word
             # highest possible is word dot product with itself
             # lowest allowed score is 0
-            pos_score = max(int((pos_sent_comp / pos_self_comp)*100), 0)
-            neg_score = max(int((neg_sent_comp / neg_self_comp)*100), 0)
-            pos_scores_sentence.append(pos_score)
-            neg_scores_sentence.append(neg_score)
+            pos_score_sentence = max(int(pt.dot(norm_sent_embedding, norm_pos_embedding).item()*100), 0)
+            neg_score_sentence = max(int(pt.dot(norm_sent_embedding, norm_neg_embedding).item()*100), 0)
+            # save pos/neg scores compared to each word for sentence
+            pos_scores_sentence.append(pos_score_sentence)
+            neg_scores_sentence.append(neg_score_sentence)
+        # save mean of sentence score vs each pos/neg word
         pos_scores.append(np.mean(pos_scores_sentence))
         neg_scores.append(np.mean(neg_scores_sentence))
 
-    # return mean of pos and neg scores
+    # return mean of pos and neg scores for each sentence
     return np.mean(pos_scores), np.mean(neg_scores)
 
 

@@ -25,8 +25,8 @@ The text is processed and separated into sentence-long context windows for the s
 
 HuggingFace offers many pretrained LLMs designed to serve different applications.
 This project uses a version of the DistilBERT model, a transformer-based model designed for use in sequence classification, making it an excellent fit for this task.
-Sentences are embedded in a vector space where vectors (i.e., words or sentences) of a similar nature occupy the same localized region of the vector space.
-A dot product between two vectors quantifies how similar they are, and so taking the dot product of a sentence and a predefined ''positive'' (or negative) word, like ''optimistic'', returns a scalar value that measures how ''optimistic'' that sentence is.
+Sentences are embedded in a vector space where vectors (i.e., words or sentences) of a similar nature point in the same direction.
+A (normalized) dot product between two vectors quantifies how similar they are, and so taking the dot product between a sentence embedding and a predefined ''positive'' (or negative) word embedding, like ''optimistic'', returns a scalar value that measures how ''optimistic'' that sentence is.
 
 #### Database
 
