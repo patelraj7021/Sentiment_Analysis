@@ -9,7 +9,7 @@ import sys
 import os
 import pytest
 sys.path.append(os.path.dirname(os.getcwd()))
-from sentiment_analysis import analysis_script as a_s
+from sentiment_analysis import analysis_module as a_m
 import torch as pt
 import numpy as np
 
@@ -22,7 +22,7 @@ def create_pos_word_embeddings():
                  'optimistic',
                  'hopeful'
                  ]
-    pos_sequences, pos_model, pos_embeddings = a_s.embed_sequences(pos_words)
+    pos_sequences, pos_model, pos_embeddings = a_m.embed_sequences(pos_words)
     
     return pos_sequences, pos_model, pos_embeddings
 
@@ -33,7 +33,7 @@ def create_neg_word_embeddings():
     neg_words = ['negative',  
                  'pessimistic',
                  'cautious']
-    neg_sequences, neg_model, neg_embeddings = a_s.embed_sequences(neg_words)
+    neg_sequences, neg_model, neg_embeddings = a_m.embed_sequences(neg_words)
     
     return neg_sequences, neg_model, neg_embeddings
 
