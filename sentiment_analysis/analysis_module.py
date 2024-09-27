@@ -9,7 +9,7 @@ from transformers import DistilBertTokenizer, DistilBertForSequenceClassificatio
 import os
 import torch as pt
 import numpy as np
-from crawl_script import crawl_ticker
+from .crawl_module import crawl_ticker
 
     
 def embed_sequences(input_seqs):   
