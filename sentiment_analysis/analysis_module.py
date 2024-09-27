@@ -83,7 +83,10 @@ def analyze_ticker(data_filepath):
     # analyze each article file and save its pos and neg scores
     for data_file in os.listdir(data_filepath):
         with open(os.path.join(data_filepath, data_file), 'r') as file:
-            text = file.read().split('.')
+            data_input = file.read().split('.')
+            date = data_input[0]
+            title = data_input[1]
+            text = data_input[1:]
             sequences, model_output, embeddings = embed_sequences(text)
             article_pos_score, article_neg_score = compare_text(embeddings)
             ticker_pos_scores.append(int(article_pos_score))

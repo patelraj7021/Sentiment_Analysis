@@ -37,15 +37,17 @@ class ArticleTextSpider(scrapy.Spider):
     def article_parse(self, response):
         # crawl through article page to get text
         # get title
-        title = response.xpath(
-            '//h1[@data-test-locator="headline"]/text()').get()
-        title = re.sub(r'\W+', '', title)
-        title = re.sub('\s+', '_', title)
+        raw_title = response.xpath('//h1[@data-test-locator="headline"]/text()').get()
+        cleaned_title = re.sub(r'\s+', '_', raw_title)
+        cleaned_title = re.sub(r'\W+', '', cleaned_title)
+        # get date
+        date = response.xpath('//div[@class="caas-attr-time-style"]/time/@datetime').get()
         # get text
-        text = response.xpath(
-            '//div[@class="caas-body"]//text()').extract()
+        text = response.xpath('//div[@class="caas-body"]//text()').extract()
         text = ' '.join(text)
-        text_filepath = os.path.join('article_temp_files', title + '.log')
+        text_filepath = os.path.join('article_temp_files', 
+                                     cleaned_title + '.log')
         with open(text_filepath, 'w') as file:
-            # for p in text:
-            file.write(text)
+            file.write(date  + '.\n' +
+                       raw_title + '.\n' +
+                       response.text)
