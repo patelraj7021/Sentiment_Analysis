@@ -6,6 +6,10 @@ from rest_framework.response import Response
 from .serializers import AnalyzeRequestSerializer, SummariesSerializer
 from .models import Summaries
 from datetime import datetime
+import sys
+sys.path.append('../sentiment_analysis')
+from analysis_module import analysis_wrapper
+import numpy as np
 
 
 
@@ -35,7 +39,9 @@ class AnalyzeRequestView(APIView):
             # else:
             #     new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=50)
             #     new_summary.save()
-            new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=50)
+            ticker_pos_scores, ticker_neg_scores, ticker_pos_neg_fracs = analysis_wrapper(ticker)
+            overall_rating = np.mean(ticker_pos_neg_fracs)
+            new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=overall_rating)
             new_summary.save()
                 
             return Response(SummariesSerializer(new_summary).data)

@@ -60,22 +60,22 @@ def dot_product_differing_comparision(embeddings_same, embeddings_different):
     result = True
     num_words = embeddings_same.shape[0]
     for i in range(num_words):
-        pos_prods = []
-        neg_prods = []
+        same_prods = []
+        different_prods = []
         for j in range(num_words):
             norm_same_embedding_i = normalize(embeddings_same[i, 0, :], dim=0)
             norm_same_embedding_j = normalize(embeddings_same[j, 0, :], dim=0)
             norm_different_embedding = normalize(embeddings_different[j, 0, :], dim=0)
-            neg_prod = pt.dot(norm_same_embedding_i, norm_different_embedding).item()
-            pos_prod = pt.dot(norm_same_embedding_i, norm_same_embedding_j).item()
-            pos_prods.append(pos_prod)
-            neg_prods.append(neg_prod)
-        if max(neg_prods) >= min(pos_prods):
+            different_prod = pt.dot(norm_same_embedding_i, norm_different_embedding).item()
+            same_prod = pt.dot(norm_same_embedding_i, norm_same_embedding_j).item()
+            same_prods.append(same_prod)
+            different_prods.append(different_prod)
+        if max(different_prods) >= min(same_prods):
             result = False
     return result
     
 
-class TestTokenComparison:
+class TestEmbeddingComparison:
     
     def test_identity_correlation(self, create_pos_word_embeddings,
                                  create_neg_word_embeddings):

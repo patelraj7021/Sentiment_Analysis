@@ -103,3 +103,5 @@ def should_abort_request(request):
     )
 
 PLAYWRIGHT_ABORT_REQUEST = should_abort_request
+
+LOG_ENABLED = False

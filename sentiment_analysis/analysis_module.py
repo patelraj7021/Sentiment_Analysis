@@ -10,7 +10,7 @@ import os
 import torch as pt
 from torch.nn.functional import normalize
 import numpy as np
-from .crawl_module import crawl_ticker
+from crawl_module import crawl_ticker
 
     
 def embed_sequences(input_seqs):   
@@ -57,9 +57,9 @@ def compare_text(embeddings):
         neg_scores_sentence = []        
         for j in range(num_comp_words):
             # normalize all vectors so only direction is used for comparison
-            norm_pos_embedding = normalize(pos_embeddings[j, 0, :])
-            norm_neg_embedding = normalize(neg_embeddings[j, 0, :])
-            norm_sent_embedding = normalize(embeddings[j, 0, :])
+            norm_pos_embedding = normalize(pos_embeddings[j, 0, :], dim=0)
+            norm_neg_embedding = normalize(neg_embeddings[j, 0, :], dim=0)
+            norm_sent_embedding = normalize(embeddings[j, 0, :], dim=0)
             # comparison score is relative to highest possible for a word
             # highest possible is word dot product with itself
             # lowest allowed score is 0
