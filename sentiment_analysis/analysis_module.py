@@ -7,12 +7,13 @@ Created on Wed Sep 18 23:07:07 2024
 
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification 
 import os
+import shutil
 import torch as pt
 from torch.nn.functional import normalize
 import numpy as np
-from crawl_module import crawl_ticker
 from article_record_class import ArticleRecord
 import re
+import subprocess
 
     
 def embed_sequences(input_seqs):   
@@ -94,9 +95,10 @@ def analyze_ticker(data_filepath, ticker):
                 # some articles have a paywall that only shows first few sentences
                 # don't include these in analysis
                 print('Skipped paywalled article')
-                pass
+                continue
             sequences, model_output, embeddings = embed_sequences(text)
             article_pos_score, article_neg_score = compare_text(embeddings)
+            # relative comparison between pos and neg score
             article_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
             new_record = ArticleRecord(ticker, 
                                        title=article_title, 
@@ -112,7 +114,26 @@ def analyze_ticker(data_filepath, ticker):
 
 def analysis_wrapper(ticker):
     # web scraping
-    data_filepath = crawl_ticker(ticker)
+
+    # delete log folder from previous code executions
+    data_filepath = os.path.join(os.getcwd(), 'article_temp_files')
+    if os.path.exists(data_filepath):
+        shutil.rmtree(data_filepath)
+    # create folder
+    os.makedirs(data_filepath)
+    
+    # this next line is not ideal
+    # but it needs to be done in this way because scrapy's twisted reactors
+    # can't be restarted after stopping
+    # so users would be unable to query a different ticker after querying a first one
+    # running it as a subprocess that ends after dumping crawling data in a folder works
+    # since it runs under a different python process
+    subprocess.run(['python', 'crawl_module.py', 'crawl_ticker', ticker])
+    
     # analysis 
     result = analyze_ticker(data_filepath, ticker)
     return result
+
+
+if __name__ == '__main__':
+    analysis_wrapper('NVDA')
