@@ -11,6 +11,8 @@ import torch as pt
 from torch.nn.functional import normalize
 import numpy as np
 from crawl_module import crawl_ticker
+from article_record_class import ArticleRecord
+import re
 
     
 def embed_sequences(input_seqs):   
@@ -59,7 +61,7 @@ def compare_text(embeddings):
             # normalize all vectors so only direction is used for comparison
             norm_pos_embedding = normalize(pos_embeddings[j, 0, :], dim=0)
             norm_neg_embedding = normalize(neg_embeddings[j, 0, :], dim=0)
-            norm_sent_embedding = normalize(embeddings[j, 0, :], dim=0)
+            norm_sent_embedding = normalize(embeddings[i, 0, :], dim=0)
             # comparison score is relative to highest possible for a word
             # highest possible is word dot product with itself
             # lowest allowed score is 0
@@ -76,30 +78,41 @@ def compare_text(embeddings):
     return np.mean(pos_scores), np.mean(neg_scores)
 
 
-def analyze_ticker(data_filepath):
-    ticker_pos_scores = []
-    ticker_neg_scores = []
-    ticker_pos_neg_fracs = []
-    # analyze each article file and save its pos and neg scores
+def analyze_ticker(data_filepath, ticker):
+    article_records = []
+    # analyze each article file and save its pos and neg scores as an ArticleRecord object
     for data_file in os.listdir(data_filepath):
         with open(os.path.join(data_filepath, data_file), 'r') as file:
-            data_input = file.read().split('.')
-            date = data_input[0]
-            title = data_input[1]
-            text = data_input[1:]
+            data_input = file.read().split('\n')
+            # get meta data from file
+            article_date = data_input[0]
+            article_link = data_input[1]
+            article_title = data_input[2]
+            # split each sentence on punctuation
+            text = [article_title] + re.split(r'[!.?]\s*', data_input[3])
+            if len(text) < 5:
+                # some articles have a paywall that only shows first few sentences
+                # don't include these in analysis
+                print('Skipped paywalled article')
+                pass
             sequences, model_output, embeddings = embed_sequences(text)
             article_pos_score, article_neg_score = compare_text(embeddings)
-            ticker_pos_scores.append(int(article_pos_score))
-            ticker_neg_scores.append(int(article_neg_score))
-            ticker_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
-            ticker_pos_neg_fracs.append(ticker_pos_neg_frac)
+            article_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
+            new_record = ArticleRecord(ticker, 
+                                       title=article_title, 
+                                       date=article_date,
+                                       link=article_link,
+                                       pos_score=article_pos_score,
+                                       neg_score=article_neg_score,
+                                       overall_rating=article_pos_neg_frac)
+            article_records.append(new_record)
 
-    return ticker_pos_scores, ticker_neg_scores, ticker_pos_neg_fracs
+    return article_records
 
 
 def analysis_wrapper(ticker):
     # web scraping
     data_filepath = crawl_ticker(ticker)
     # analysis 
-    result = analyze_ticker(data_filepath)
+    result = analyze_ticker(data_filepath, ticker)
     return result

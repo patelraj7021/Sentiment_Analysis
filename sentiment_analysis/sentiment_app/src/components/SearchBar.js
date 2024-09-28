@@ -27,9 +27,9 @@ export default class SearchBar extends Component {
         ticker: this.state.ticker,
       }),
     };
-    fetch("/sentiment_app/analyze-request", requestOptions)
-      .then((response) => response.json())
-      .then((data) => console.log(data));
+    fetch("/sentiment_app/analyze-request", requestOptions);
+    // .then((response) => response.json())
+    // .then((data) => console.log(data));
   }
 
   render() {

@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import AnalyzeRequestSerializer, SummariesSerializer
-from .models import Summaries
+from .serializers import AnalyzeRequestSerializer, SummariesSerializer, ArticlesSerializer
+from .models import Summaries, Articles
 from datetime import datetime
 import sys
 sys.path.append('../sentiment_analysis')
@@ -20,6 +20,11 @@ def main(request):
 class SummariesView(generics.ListAPIView):
     queryset = Summaries.objects.all()
     serializer_class = SummariesSerializer
+    
+
+class ArticlesView(generics.ListAPIView):
+    queryset = Articles.objects.all()
+    serializer_class = ArticlesSerializer
 
 
 def index(request, *arg, **kwargs):
@@ -33,15 +38,25 @@ class AnalyzeRequestView(APIView):
         if serializer.is_valid():
             ticker = serializer.data.get('ticker')
             current_date = datetime.today().strftime('%Y-%m-%d')
-            # queryset = Summaries.objects.filter(ticker=ticker, date=current_date)
-            # if queryset.exists():
-            #     debug_output = 'data exists'
-            # else:
-            #     new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=50)
-            #     new_summary.save()
-            ticker_pos_scores, ticker_neg_scores, ticker_pos_neg_fracs = analysis_wrapper(ticker)
-            overall_rating = np.mean(ticker_pos_neg_fracs)
-            new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=overall_rating)
-            new_summary.save()
+            # run analysis
+            article_records = analysis_wrapper(ticker)
+            for article_record in article_records:
+                # search if article already exists in database
+                # from previous analysis runs
+                query = Articles.objects.filter(link=article_record.link)
+                if not query.exists():                   
+                    # only create new record if it doesn't
+                    new_record = Articles(ticker=ticker,
+                                        title=article_record.title,
+                                        date=article_record.date,
+                                        link=article_record.link,
+                                        pos_score=article_record.pos_score,
+                                        neg_score=article_record.neg_score,
+                                        overall_rating=article_record.overall_rating)
+                    new_record.save()
                 
-            return Response(SummariesSerializer(new_summary).data)
+            
+            # new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=overall_rating)
+            # new_summary.save()
+                
+            return Response(status=status.HTTP_201_CREATED)

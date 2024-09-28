@@ -38,16 +38,19 @@ class ArticleTextSpider(scrapy.Spider):
         # crawl through article page to get text
         # get title
         raw_title = response.xpath('//h1[@data-test-locator="headline"]/text()').get()
+        # need a no spaces, no spec. chars. version of title for file naming
         cleaned_title = re.sub(r'\s+', '_', raw_title)
         cleaned_title = re.sub(r'\W+', '', cleaned_title)
         # get date
-        date = response.xpath('//div[@class="caas-attr-time-style"]/time/@datetime').get()
+        datetime = response.xpath('//div[@class="caas-attr-time-style"]/time/@datetime').get()
+        date = datetime.split('T')[0]
         # get text
         text = response.xpath('//div[@class="caas-body"]//text()').extract()
         text = ' '.join(text)
         text_filepath = os.path.join('article_temp_files', 
                                      cleaned_title + '.log')
         with open(text_filepath, 'w') as file:
-            file.write(date  + '.\n' +
-                       raw_title + '.\n' +
-                       response.text)
+            file.write(date  + '\n' +
+                       response.url + ' \n' +
+                       raw_title + '\n' +
+                       text)
