@@ -57,7 +57,8 @@ class AnalyzeRequestView(APIView):
                                           overall_rating=article_record.overall_rating)
                     new_record.save()
             past_week_articles = Articles.objects.filter(date__range=[current_date-timedelta(days=7),
-                                                                      current_date])
+                                                                      current_date],
+                                                         ticker=ticker)
             avg_rating = int(past_week_articles.aggregate(Avg("overall_rating"))['overall_rating__avg'])
             try:
                 # update record for the day if it exists
@@ -68,25 +69,6 @@ class AnalyzeRequestView(APIView):
                 # create a new one if it doesn't
                 new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=avg_rating)
                 new_summary.save()
-            # if query.exists():
-            #     # update record for the day if it exists
-            #     query.overall_rating = avg_rating
-            #     query.save(update_fields=['overall_rating'])
-            # else:
-            #     # create a new one if it doesn't
-            #     new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=avg_rating)
-            #     new_summary.save()
+            query = Summaries.objects.get(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
                 
-            return Response(status=status.HTTP_201_CREATED)
-
-
-class UpdateSummaryCircle(APIView):
-    serializer = AnalyzeRequestSerializer
-    def get(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        current_date = datetime.today()
-        if serializer.is_valid():
-            ticker = serializer.data.get('ticker')
-            query = Summaries.objects.filter(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
-            result = {'overall_rating': query.overall_rating}
-            return JsonResponse(result, status=status.HTTP_200_OK)
+            return Response(SummariesSerializer(query).data, status=status.HTTP_201_CREATED)
