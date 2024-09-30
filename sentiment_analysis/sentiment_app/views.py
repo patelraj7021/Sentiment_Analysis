@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -59,14 +59,34 @@ class AnalyzeRequestView(APIView):
             past_week_articles = Articles.objects.filter(date__range=[current_date-timedelta(days=7),
                                                                       current_date])
             avg_rating = int(past_week_articles.aggregate(Avg("overall_rating"))['overall_rating__avg'])
-            query = Summaries.objects.filter(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
-            if query.exists():
+            try:
                 # update record for the day if it exists
+                query = Summaries.objects.get(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
                 query.overall_rating = avg_rating
                 query.save(update_fields=['overall_rating'])
-            else:
+            except:
                 # create a new one if it doesn't
                 new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=avg_rating)
                 new_summary.save()
+            # if query.exists():
+            #     # update record for the day if it exists
+            #     query.overall_rating = avg_rating
+            #     query.save(update_fields=['overall_rating'])
+            # else:
+            #     # create a new one if it doesn't
+            #     new_summary = Summaries(ticker=ticker, date=current_date, overall_rating=avg_rating)
+            #     new_summary.save()
                 
             return Response(status=status.HTTP_201_CREATED)
+
+
+class UpdateSummaryCircle(APIView):
+    serializer = AnalyzeRequestSerializer
+    def get(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        current_date = datetime.today()
+        if serializer.is_valid():
+            ticker = serializer.data.get('ticker')
+            query = Summaries.objects.filter(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
+            result = {'overall_rating': query.overall_rating}
+            return JsonResponse(result, status=status.HTTP_200_OK)
