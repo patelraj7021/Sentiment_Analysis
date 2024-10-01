@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Summary from "./Summary";
 import SearchBar from "./SearchBar";
 import TopArticles from "./TopArticles";
@@ -21,6 +21,7 @@ export default function App() {
     { title: "-" },
     { title: "-" },
   ]);
+  const [loading, setLoading] = useState(false);
 
   const handleTickerChange = (e) => {
     setTicker(e.target.value);
@@ -62,7 +63,11 @@ export default function App() {
 
     let new_summary_circle_values = new Array(3);
     // chain fetch calls to update UI
-    fetch("/sentiment-app/analyze-request", analyze_request_options)
+    fetch("/sentiment-app/") // empty call just for making button loading change work
+      .then(() => {
+        setLoading(true);
+        return fetch("/sentiment-app/analyze-request", analyze_request_options);
+      })
       .then(() => {
         // update today summary circle
         return fetch(
@@ -111,7 +116,10 @@ export default function App() {
       })
       .then((response) => response.json())
       // set state for articles with lowest ratings
-      .then((data) => setTopArticlesNeg(data));
+      .then((data) => {
+        setTopArticlesNeg(data);
+        setLoading(false);
+      });
   };
 
   return (
@@ -120,6 +128,7 @@ export default function App() {
         ticker={ticker}
         onChange={handleTickerChange}
         onClick={handleAnalyzePress}
+        loading={loading}
       />
       <Grid container spacing={2}>
         <Summary circle_ratings={circle_ratings} />
