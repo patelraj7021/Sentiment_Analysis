@@ -4,7 +4,8 @@ from django.db.models import Avg
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import AnalyzeRequestSerializer, SummariesSerializer, ArticlesSerializer
+from .serializers import AnalyzeRequestSerializer, SummariesSerializer, \
+    ArticlesSerializer, TopArticlesSerializer
 from .models import Summaries, Articles
 from datetime import datetime, timedelta
 import sys
@@ -72,3 +73,20 @@ class AnalyzeRequestView(APIView):
             query = Summaries.objects.get(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
                 
             return Response(SummariesSerializer(query).data, status=status.HTTP_201_CREATED)
+        
+        
+class TopArticlesView(APIView):
+    serializer_class = TopArticlesSerializer
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            ticker = serializer.data.get('ticker')
+            sort_order = serializer.data.get('sort_order')
+            current_date = datetime.today()
+            queryset = Articles.objects.filter(ticker=ticker, 
+                                               date__range=[current_date-timedelta(days=4), 
+                                                            current_date])                                                        
+            queryset_ordered = queryset.order_by(f'{sort_order}')[:4]
+            
+            return Response(ArticlesSerializer(queryset_ordered, many=True).data, 
+                            status=status.HTTP_200_OK)

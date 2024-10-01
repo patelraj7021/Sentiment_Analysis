@@ -19,3 +19,9 @@ class AnalyzeRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Summaries
         fields = ['ticker']
+        
+
+class TopArticlesSerializer(serializers.Serializer):
+    ticker = serializers.CharField(max_length=8)
+    sort_order = serializers.CharField(max_length=16)
+    
