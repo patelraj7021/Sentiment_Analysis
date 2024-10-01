@@ -7,7 +7,7 @@ export default function Summary(props) {
   return (
     <Box sx={{ position: "relative", display: "inline-flex" }}>
       <CircularProgress
-        value={props.overall_rating}
+        value={props.circle_ratings[1]}
         variant="determinate"
         size="16rem"
       />
@@ -23,7 +23,7 @@ export default function Summary(props) {
           justifyContent: "center",
         }}
       >
-        <Typography variant="h3">{props.overall_rating}</Typography>
+        <Typography variant="h3">{props.circle_ratings[1]}</Typography>
       </Box>
     </Box>
   );

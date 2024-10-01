@@ -25,3 +25,7 @@ class TopArticlesSerializer(serializers.Serializer):
     ticker = serializers.CharField(max_length=8)
     sort_order = serializers.CharField(max_length=16)
     
+    
+class SummaryCircleSerializer(serializers.Serializer):
+    ticker = serializers.CharField(max_length=8)
+    date_delta = serializers.IntegerField()
