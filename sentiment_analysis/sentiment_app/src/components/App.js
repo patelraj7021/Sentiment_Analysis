@@ -3,12 +3,13 @@ import Summary from "./Summary";
 import SearchBar from "./SearchBar";
 import TopArticles from "./TopArticles";
 import Grid from "@mui/material/Grid2";
-import Typography from "@mui/material/Typography";
-import { Button, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
+import Historical from "./Historical";
 
 export default function App() {
   const [ticker, setTicker] = useState("NVDA");
   const [circle_ratings, setCircleRatings] = useState([50, 50, 50]);
+  const [loading, setLoading] = useState(false);
   const [top_articles_pos, setTopArticlesPos] = useState([
     { title: "-" },
     { title: "-" },
@@ -21,7 +22,7 @@ export default function App() {
     { title: "-" },
     { title: "-" },
   ]);
-  const [loading, setLoading] = useState(false);
+  const [historical_data, setHistoricalData] = useState([]);
 
   const handleTickerChange = (e) => {
     setTicker(e.target.value);
@@ -118,25 +119,67 @@ export default function App() {
       // set state for articles with lowest ratings
       .then((data) => {
         setTopArticlesNeg(data);
+      })
+      .then(() => {
+        // get historical summaries data for past 30 days
+        return fetch("/sentiment-app/historical", analyze_request_options);
+      })
+      .then((response) => response.json())
+      // set state for historical data
+      .then((data) => {
+        console.log(
+          data.map((v) => ({
+            x: new Date(v.date),
+            y: v.overall_rating,
+            id: v.id,
+          }))
+        );
+        setHistoricalData(data);
+      })
+      .then(() => {
         setLoading(false);
       });
   };
 
   return (
-    <Grid container spacing={2} margin="auto" direction="column">
-      <SearchBar
-        ticker={ticker}
-        onChange={handleTickerChange}
-        onClick={handleAnalyzePress}
-        loading={loading}
-      />
-      <Grid container spacing={2}>
-        <Summary circle_ratings={circle_ratings} />
-        <TopArticles
-          top_articles_pos={top_articles_pos}
-          top_articles_neg={top_articles_neg}
+    <Box sx={{ flexGrow: 1 }}>
+      <Box position="absolute" top="25%" width="100%">
+        <SearchBar
+          ticker={ticker}
+          onChange={handleTickerChange}
+          onClick={handleAnalyzePress}
+          loading={loading}
         />
-      </Grid>
-    </Grid>
+      </Box>
+      <Box position="absolute" top="35%" width="100%" height="50%">
+        <Grid container spacing={2}>
+          <Summary circle_ratings={circle_ratings} />
+          <TopArticles
+            top_articles_pos={top_articles_pos}
+            top_articles_neg={top_articles_neg}
+          />
+          <Historical historical_data={historical_data}></Historical>
+        </Grid>
+      </Box>
+      {/* <Grid container spacing={2} direction="column">
+        <Grid item>
+          <SearchBar
+            ticker={ticker}
+            onChange={handleTickerChange}
+            onClick={handleAnalyzePress}
+            loading={loading}
+          />
+        </Grid>
+        <Grid item>
+          <Grid container spacing={2}>
+            <Summary circle_ratings={circle_ratings} />
+            <TopArticles
+              top_articles_pos={top_articles_pos}
+              top_articles_neg={top_articles_neg}
+            />
+          </Grid>
+        </Grid>
+      </Grid> */}
+    </Box>
   );
 }

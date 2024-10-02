@@ -7,8 +7,15 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function SearchBar(props) {
   return (
-    <Grid container spacing={2}>
-      <Grid item margin="auto">
+    <Grid container spacing={2} columns={4}>
+      <Grid
+        item
+        display="flex"
+        justifyContent="right"
+        alignItems="center"
+        offset={1}
+        size={1}
+      >
         <TextField
           id="search-input"
           label="Enter Stock Ticker"
@@ -17,7 +24,7 @@ export default function SearchBar(props) {
           defaultValue={props.ticker}
         />
       </Grid>
-      <Grid item margin="auto">
+      <Grid item display="flex" justifyContent="left" alignItems="center">
         <LoadingButton
           color="primary"
           variant="contained"

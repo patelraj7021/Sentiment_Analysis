@@ -118,3 +118,19 @@ class SummaryCircleView(APIView):
             return Response(SummariesSerializer(result).data, 
                             status=status.HTTP_200_OK)
             
+
+class HistoricalView(APIView):
+    # return 3 day averaged ratings for last 30 days from Summaries table
+    serializer_class = AnalyzeRequestSerializer
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            ticker = serializer.data.get('ticker')
+            current_date = datetime.today()
+            date_delta = 31
+            queryset = Summaries.objects.filter(ticker=ticker, 
+                                                date__range=[current_date-timedelta(days=date_delta), 
+                                                            current_date])
+            return Response(SummariesSerializer(queryset, many=True).data, 
+                            status=status.HTTP_200_OK)
+            
