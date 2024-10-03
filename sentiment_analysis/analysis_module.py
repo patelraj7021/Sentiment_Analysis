@@ -15,6 +15,7 @@ from article_record_class import ArticleRecord
 import re
 import subprocess
 
+
     
 def embed_sequences(input_seqs):   
     # initialize transformer
@@ -79,40 +80,34 @@ def compare_text(embeddings):
     return np.mean(pos_scores), np.mean(neg_scores)
 
 
-def analyze_ticker(data_filepath, ticker):
-    article_records = []
-    # analyze each article file and save its pos and neg scores as an ArticleRecord object
-    for data_file in os.listdir(data_filepath):
-        with open(os.path.join(data_filepath, data_file), 'r') as file:
-            data_input = file.read().split('\n')
-            # get meta data from file
-            article_date = data_input[0]
-            article_link = data_input[1]
-            article_title = data_input[2]
-            # split each sentence on punctuation
-            text = [article_title] + re.split(r'[!.?]\s*', data_input[3])
-            if len(text) < 5:
-                # some articles have a paywall that only shows first few sentences
-                # don't include these in analysis
-                print('Skipped paywalled article')
-                continue
-            sequences, model_output, embeddings = embed_sequences(text)
-            article_pos_score, article_neg_score = compare_text(embeddings)
-            # relative comparison between pos and neg score
-            article_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
-            new_record = ArticleRecord(ticker, 
-                                       title=article_title, 
-                                       date=article_date,
-                                       link=article_link,
-                                       pos_score=article_pos_score,
-                                       neg_score=article_neg_score,
-                                       overall_rating=article_pos_neg_frac)
-            article_records.append(new_record)
+def analyze_article(data_input, ticker):
+    # get meta data from file
+    article_date = data_input[0]
+    article_link = data_input[1]
+    article_title = data_input[2]
+    # split each sentence on punctuation
+    text = [article_title] + re.split(r'[!.?]\s*', data_input[3])
+    if len(text) < 5:
+        # some articles have a paywall that only shows first few sentences
+        # don't include these in analysis
+        print('Skipped paywalled article')
+        return None 
+    sequences, model_output, embeddings = embed_sequences(text)
+    article_pos_score, article_neg_score = compare_text(embeddings)
+    # relative comparison between pos and neg score
+    article_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
+    new_record = ArticleRecord(ticker, 
+                               title=article_title, 
+                               date=article_date,
+                               link=article_link,
+                               pos_score=article_pos_score,
+                               neg_score=article_neg_score,
+                               overall_rating=article_pos_neg_frac)
 
-    return article_records
+    return new_record
 
 
-def analysis_wrapper(ticker):
+def crawling_wrapper(ticker):
     # web scraping
 
     # delete log folder from previous code executions
@@ -130,10 +125,4 @@ def analysis_wrapper(ticker):
     # since it runs under a different python process
     subprocess.run(['python', 'crawl_module.py', 'crawl_ticker', ticker])
     
-    # analysis 
-    result = analyze_ticker(data_filepath, ticker)
-    return result
-
-
-if __name__ == '__main__':
-    analysis_wrapper('NVDA')
+    return data_filepath
