@@ -127,13 +127,6 @@ export default function App() {
       .then((response) => response.json())
       // set state for historical data
       .then((data) => {
-        console.log(
-          data.map((v) => ({
-            x: new Date(v.date),
-            y: v.overall_rating,
-            id: v.id,
-          }))
-        );
         setHistoricalData(data);
       })
       .then(() => {
@@ -143,7 +136,7 @@ export default function App() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box position="absolute" top="25%" width="100%">
+      <Box position="absolute" top="20%" width="100%">
         <SearchBar
           ticker={ticker}
           onChange={handleTickerChange}
@@ -151,15 +144,13 @@ export default function App() {
           loading={loading}
         />
       </Box>
-      <Box position="absolute" top="35%" width="100%" height="50%">
-        <Grid container spacing={2}>
-          <Summary circle_ratings={circle_ratings} />
-          <TopArticles
-            top_articles_pos={top_articles_pos}
-            top_articles_neg={top_articles_neg}
-          />
-          <Historical historical_data={historical_data}></Historical>
-        </Grid>
+      <Box position="absolute" top="25%" width="100%" height="40%">
+        <Summary circle_ratings={circle_ratings} />
+        <TopArticles
+          top_articles_pos={top_articles_pos}
+          top_articles_neg={top_articles_neg}
+        />
+        <Historical historical_data={historical_data}></Historical>
       </Box>
       {/* <Grid container spacing={2} direction="column">
         <Grid item>

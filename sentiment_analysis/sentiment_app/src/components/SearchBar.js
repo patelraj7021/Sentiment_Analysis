@@ -30,7 +30,7 @@ export default function SearchBar(props) {
           variant="contained"
           onClick={props.onClick}
           loading={props.loading}
-          loadingIndicator="Analyzing..."
+          loadingIndicator="Analyzing"
           size="large"
         >
           Analyze
