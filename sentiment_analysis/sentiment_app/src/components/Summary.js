@@ -1,10 +1,9 @@
 import React from "react";
-import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { Gauge, gaugeClasses } from "@mui/x-charts";
 import LinearProgress from "@mui/material/LinearProgress";
 import { green, red, grey } from "@mui/material/colors";
+import Grid from "@mui/material/Grid2";
 
 export default function Summary(props) {
   var colors = props.circle_ratings.map((rating) => {
@@ -16,99 +15,66 @@ export default function Summary(props) {
       return grey[700];
     }
   });
+  const rating_header_variant = "h5";
+  const bar_height = "1.5rem";
   return (
-    <Box position="absolute" height="100%" width="22.5%" left="2.5%">
-      <Box
-        position="absolute"
-        height="30%"
-        width="100%"
-        alignContent="center"
-        textAlign="center"
-      >
-        <Typography variant="h5" height="30%">
-          Today: {props.circle_ratings[0]}
-        </Typography>
-        <LinearProgress
-          variant="determinate"
-          value={props.circle_ratings[0]}
-          sx={{
-            height: 1 / 3,
-            backgroundColor: "white",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: colors[0],
-            },
-          }}
-        ></LinearProgress>
-      </Box>
-      <Box
-        position="absolute"
-        top="30%"
-        height="30%"
-        width="100%"
-        alignContent="center"
-        textAlign="center"
-      >
-        <Typography variant="h5" height="30%">
-          Past 3 Days: {props.circle_ratings[1]}
-        </Typography>
-        <LinearProgress
-          variant="determinate"
-          value={props.circle_ratings[1]}
-          sx={{
-            height: 1 / 3,
-            backgroundColor: "white",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: colors[1],
-            },
-          }}
-        ></LinearProgress>
-      </Box>
-      <Box
-        position="absolute"
-        top="60%"
-        height="30%"
-        width="100%"
-        alignContent="center"
-        textAlign="center"
-      >
-        <Typography variant="h5" height="30%">
-          Past 7 Days: {props.circle_ratings[2]}
-        </Typography>
-        <LinearProgress
-          variant="determinate"
-          value={props.circle_ratings[2]}
-          sx={{
-            height: 1 / 3,
-            backgroundColor: "white",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: colors[2],
-            },
-          }}
-        ></LinearProgress>
-      </Box>
-    </Box>
+    <Grid item size={4} sx={{ textAlign: "center" }}>
+      <Grid container spacing={2} direction="column">
+        <Grid item>
+          <Typography variant={rating_header_variant}>
+            Today: {props.circle_ratings[0]}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <LinearProgress
+            variant="determinate"
+            value={props.circle_ratings[0]}
+            sx={{
+              height: bar_height,
+              backgroundColor: "white",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: colors[0],
+              },
+            }}
+          ></LinearProgress>
+        </Grid>
+        <Grid item>
+          <Typography variant={rating_header_variant}>
+            Past 3 Days: {props.circle_ratings[1]}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <LinearProgress
+            variant="determinate"
+            value={props.circle_ratings[1]}
+            sx={{
+              height: bar_height,
+              backgroundColor: "white",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: colors[1],
+              },
+            }}
+          ></LinearProgress>
+        </Grid>
+        <Grid item>
+          <Typography variant={rating_header_variant}>
+            Past 7 Days: {props.circle_ratings[2]}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <LinearProgress
+            variant="determinate"
+            value={props.circle_ratings[2]}
+            sx={{
+              height: bar_height,
+              backgroundColor: "white",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: colors[2],
+              },
+            }}
+          ></LinearProgress>
+        </Grid>
+      </Grid>
+    </Grid>
   );
-
-  {
-    /* <CircularProgress
-        value={props.circle_ratings[1]}
-        variant="determinate"
-        size="16rem"
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography variant="h3">{props.circle_ratings[1]}</Typography>
-      </Box> */
-  }
-  // );
 }

@@ -1,10 +1,11 @@
 import * as React from "react";
 import { ScatterChart } from "@mui/x-charts/ScatterChart";
 import { Box } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 export default function Historical(props) {
   return (
-    <Box position="absolute" width="30%" left="67.5%" height="100%">
+    <Grid item size={4}>
       <ScatterChart
         series={[
           {
@@ -16,7 +17,8 @@ export default function Historical(props) {
           },
         ]}
         xAxis={[{ scaleType: "utc" }]}
+        height={400}
       ></ScatterChart>
-    </Box>
+    </Grid>
   );
 }

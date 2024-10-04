@@ -5,6 +5,7 @@ import TopArticles from "./TopArticles";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Historical from "./Historical";
+import { Container } from "@mui/material";
 
 export default function App() {
   const [ticker, setTicker] = useState("NVDA");
@@ -135,25 +136,23 @@ export default function App() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Box position="absolute" top="20%" width="100%">
-        <SearchBar
-          ticker={ticker}
-          onChange={handleTickerChange}
-          onClick={handleAnalyzePress}
-          loading={loading}
-        />
-      </Box>
-      <Box position="absolute" top="25%" width="100%" height="40%">
-        <Summary circle_ratings={circle_ratings} />
-        <TopArticles
-          top_articles_pos={top_articles_pos}
-          top_articles_neg={top_articles_neg}
-        />
-        <Historical historical_data={historical_data}></Historical>
-      </Box>
-      {/* <Grid container spacing={2} direction="column">
-        <Grid item>
+    <Box
+      sx={{ flexGrow: 1 }}
+      height="100%"
+      justifyItems="center"
+      alignContent="center"
+    >
+      <Grid
+        container
+        spacing={4}
+        sx={{ justifyContent: "center", alignItems: "center" }}
+        direction="column"
+      >
+        <Grid
+          container
+          spacing={2}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
           <SearchBar
             ticker={ticker}
             onChange={handleTickerChange}
@@ -161,16 +160,21 @@ export default function App() {
             loading={loading}
           />
         </Grid>
-        <Grid item>
-          <Grid container spacing={2}>
-            <Summary circle_ratings={circle_ratings} />
-            <TopArticles
-              top_articles_pos={top_articles_pos}
-              top_articles_neg={top_articles_neg}
-            />
-          </Grid>
+        <Grid
+          container
+          spacing={2}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+          columns={12}
+          width="100%"
+        >
+          <Summary circle_ratings={circle_ratings} />
+          <TopArticles
+            top_articles_pos={top_articles_pos}
+            top_articles_neg={top_articles_neg}
+          />
+          <Historical historical_data={historical_data}></Historical>
         </Grid>
-      </Grid> */}
+      </Grid>
     </Box>
   );
 }
