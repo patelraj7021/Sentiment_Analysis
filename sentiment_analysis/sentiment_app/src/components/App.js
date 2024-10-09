@@ -5,23 +5,23 @@ import TopArticles from "./TopArticles";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Historical from "./Historical";
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 
 export default function App() {
   const [ticker, setTicker] = useState("NVDA");
   const [circle_ratings, setCircleRatings] = useState([50, 50, 50]);
   const [loading, setLoading] = useState(false);
   const [top_articles_pos, setTopArticlesPos] = useState([
-    { title: "-" },
-    { title: "-" },
-    { title: "-" },
-    { title: "-" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
   ]);
   const [top_articles_neg, setTopArticlesNeg] = useState([
-    { title: "-" },
-    { title: "-" },
-    { title: "-" },
-    { title: "-" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
+    { title: "-", overall_rating: 50, link: "/sentiment-app/" },
   ]);
   const [historical_data, setHistoricalData] = useState([]);
 
@@ -135,46 +135,94 @@ export default function App() {
       });
   };
 
+  const section_header_variant = "h5";
+
   return (
     <Box
       sx={{ flexGrow: 1 }}
       height="100%"
-      justifyItems="center"
-      alignContent="center"
+      justifyContent="center"
+      alignItems="center"
+      display="flex"
     >
-      <Grid
-        container
-        spacing={4}
-        sx={{ justifyContent: "center", alignItems: "center" }}
-        direction="column"
+      <Box
+        height={900}
+        width={1440}
+        justifyContent="center"
+        alignItems="center"
       >
-        <Grid
-          container
-          spacing={2}
-          sx={{ justifyContent: "center", alignItems: "center" }}
+        <Box
+          position="relative"
+          height="95%"
+          width="95%"
+          top="2.5%"
+          left="2.5%"
         >
-          <SearchBar
-            ticker={ticker}
-            onChange={handleTickerChange}
-            onClick={handleAnalyzePress}
-            loading={loading}
-          />
-        </Grid>
-        <Grid
-          container
-          spacing={2}
-          sx={{ justifyContent: "center", alignItems: "center" }}
-          columns={12}
-          width="100%"
-        >
-          <Summary circle_ratings={circle_ratings} />
-          <TopArticles
-            top_articles_pos={top_articles_pos}
-            top_articles_neg={top_articles_neg}
-          />
-          <Historical historical_data={historical_data}></Historical>
-        </Grid>
-      </Grid>
+          <Grid
+            container
+            spacing={3}
+            sx={{ justifyContent: "center", alignItems: "center" }}
+            direction="column"
+          >
+            <Grid item>
+              <Typography variant="h4"> Stock Sentiment Analyzer </Typography>
+            </Grid>
+            <Grid
+              container
+              spacing={2}
+              sx={{ justifyContent: "center", alignItems: "center" }}
+            >
+              <SearchBar
+                ticker={ticker}
+                onChange={handleTickerChange}
+                onClick={handleAnalyzePress}
+                loading={loading}
+              />
+            </Grid>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+              }}
+              columns={12}
+              width="100%"
+            >
+              <Grid item size={4}>
+                <Typography variant={section_header_variant}>
+                  Sentiment Overviews
+                </Typography>
+              </Grid>
+              <Grid item size={4}>
+                <Typography variant={section_header_variant}>
+                  Top Recent Articles
+                </Typography>
+              </Grid>
+              <Grid item size={4}>
+                <Typography variant={section_header_variant}>
+                  Monthly Trend
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              spacing={2}
+              sx={{ justifyContent: "center", alignItems: "flex-start" }}
+              columns={12}
+              width="100%"
+            >
+              <Summary circle_ratings={circle_ratings} />
+              <TopArticles
+                top_articles_pos={top_articles_pos}
+                top_articles_neg={top_articles_neg}
+              />
+              <Historical historical_data={historical_data}></Historical>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 }

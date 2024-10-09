@@ -7,7 +7,6 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function SearchBar(props) {
   return (
-    // <Grid container spacing={2} columns={4}>
     <>
       <Grid item justifyContent="center" alignItems="center" lg={12}>
         <TextField
@@ -30,8 +29,6 @@ export default function SearchBar(props) {
           Analyze
         </LoadingButton>
       </Grid>
-
-      {/* </Grid> */}
     </>
   );
 }

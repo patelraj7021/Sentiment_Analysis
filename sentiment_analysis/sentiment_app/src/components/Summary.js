@@ -15,7 +15,7 @@ export default function Summary(props) {
       return grey[700];
     }
   });
-  const rating_header_variant = "h5";
+  const rating_header_variant = "h6";
   const bar_height = "1.5rem";
   return (
     <Grid item size={4} sx={{ textAlign: "center" }}>
