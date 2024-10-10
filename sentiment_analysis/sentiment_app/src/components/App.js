@@ -99,7 +99,16 @@ export default function App() {
       })
       .then((response) => response.json())
       // set state for articles with highest ratings
-      .then((data) => setTopArticlesPos(data))
+      .then((data) => {
+        while (data.length < 4) {
+          data.push({
+            title: "-",
+            overall_rating: 50,
+            link: "/sentiment-app/",
+          });
+        }
+        setTopArticlesPos(data);
+      })
       .then(() => {
         // get articles with lowest ratings in past 4 days
         return fetch(
@@ -110,6 +119,13 @@ export default function App() {
       .then((response) => response.json())
       // set state for articles with lowest ratings
       .then((data) => {
+        while (data.length < 4) {
+          data.push({
+            title: "-",
+            overall_rating: 50,
+            link: "/sentiment-app/",
+          });
+        }
         setTopArticlesNeg(data);
       })
       .then(() => {

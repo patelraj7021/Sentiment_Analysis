@@ -70,7 +70,11 @@ class AnalyzeRequestView(APIView):
             past_3days_articles = Articles.objects.filter(date__range=[current_date-timedelta(days=4),
                                                                       current_date],
                                                          ticker=ticker)
-            avg_rating = int(past_3days_articles.aggregate(Avg("overall_rating"))['overall_rating__avg'])
+            if past_3days_articles.count() == 0:
+                # 50 is the default rating on the UI, so it won't update anything
+                avg_rating = 50
+            else:
+                avg_rating = int(past_3days_articles.aggregate(Avg("overall_rating"))['overall_rating__avg'])
             try:
                 # update record for the day if it exists
                 query = Summaries.objects.get(ticker=ticker, date=current_date.strftime('%Y-%m-%d'))
@@ -116,7 +120,11 @@ class SummaryCircleView(APIView):
             queryset = Articles.objects.filter(ticker=ticker, 
                                                date__range=[current_date-timedelta(days=date_delta), 
                                                             current_date])
-            avg_rating = int(queryset.aggregate(Avg("overall_rating"))['overall_rating__avg'])
+            if queryset.count() == 0:
+                # 50 is the default rating on the UI, so it won't update anything
+                avg_rating = 50
+            else:
+                avg_rating = int(queryset.aggregate(Avg("overall_rating"))['overall_rating__avg'])
             result = Summaries(ticker=ticker, 
                                date=current_date.strftime('%Y-%m-%d'), 
                                overall_rating=avg_rating)

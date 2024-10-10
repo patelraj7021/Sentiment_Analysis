@@ -11,7 +11,7 @@ import { IconButton } from "@mui/material";
 export default function TopArticles(props) {
   const article_title_text_variant = "subtitle2";
   const section_header_variant = "h6";
-  const article_rating_variant = "h5";
+  const article_rating_variant = "h6";
 
   const set_rating_color = (rating) => {
     if (rating <= 40) {
@@ -41,7 +41,10 @@ export default function TopArticles(props) {
               position="relative"
               width={35}
               height={35}
-              sx={{ bgcolor: set_rating_color(article_entry.overall_rating) }}
+              sx={{
+                bgcolor: set_rating_color(article_entry.overall_rating),
+                borderRadius: "10%",
+              }}
             >
               <Typography variant={article_rating_variant} color="white">
                 {article_entry.overall_rating}
