@@ -69,7 +69,7 @@ export default function TopArticles(props) {
 
   return (
     <Grid item size={4}>
-      <Grid container spacing={2} direction="column">
+      <Grid container spacing={1} direction="column">
         <Grid item>
           <Typography variant={section_header_variant}>
             Optimistic Articles
