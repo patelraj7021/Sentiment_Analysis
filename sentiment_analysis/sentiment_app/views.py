@@ -52,7 +52,7 @@ class AnalyzeRequestView(APIView):
                     article_link = data_input[1]
                     # search if article already exists in database
                     # from previous analysis runs
-                    query = Articles.objects.filter(link=article_link)
+                    query = Articles.objects.filter(link=article_link, ticker=ticker)
                     if not query.exists():                   
                         # only run analysis if it doesn't
                         article_analysis = analyze_article(data_input, ticker)
