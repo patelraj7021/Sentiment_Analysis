@@ -23,7 +23,7 @@ export default function SearchBar(props) {
           variant="contained"
           onClick={props.onClick}
           loading={props.loading}
-          loadingIndicator="Analyzing"
+          loadingIndicator="Updating"
           size="large"
         >
           Analyze

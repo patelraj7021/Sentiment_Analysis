@@ -65,10 +65,66 @@ export default function App() {
     };
 
     let new_summary_circle_values = new Array(3);
-    // chain fetch calls to update UI
+    // fetch existing data for quick update
+    fetch("/sentiment-app/summary-circle", summary_circle_options(1))
+      .then((response) => response.json())
+      .then((data) => {
+        setLoading(true);
+        new_summary_circle_values[0] = data.overall_rating;
+        // update past 3 days summary circle
+        return fetch(
+          "/sentiment-app/summary-circle",
+          summary_circle_options(4)
+        );
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        new_summary_circle_values[1] = data.overall_rating;
+        // update past 7 days summary circle
+        return fetch(
+          "/sentiment-app/summary-circle",
+          summary_circle_options(8)
+        );
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        new_summary_circle_values[2] = data.overall_rating;
+        // set state for Summary component
+        setCircleRatings(new_summary_circle_values);
+        // get articles with highest ratings in past 4 days
+        return fetch(
+          "/sentiment-app/top-articles",
+          top_articles_options("-overall_rating")
+        );
+      })
+      .then((response) => response.json())
+      // set state for articles with highest ratings
+      .then((data) => setTopArticlesPos(data))
+      .then(() => {
+        // get articles with lowest ratings in past 4 days
+        return fetch(
+          "/sentiment-app/top-articles",
+          top_articles_options("overall_rating")
+        );
+      })
+      .then((response) => response.json())
+      // set state for articles with lowest ratings
+      .then((data) => {
+        setTopArticlesNeg(data);
+      })
+      .then(() => {
+        // get historical summaries data for past 30 days
+        return fetch("/sentiment-app/historical", analyze_request_options);
+      })
+      .then((response) => response.json())
+      // set state for historical data
+      .then((data) => {
+        setHistoricalData(data);
+      });
+
+    // fetch articles and update again
     fetch("/sentiment-app/") // empty call just for making button loading change work
       .then(() => {
-        setLoading(true);
         return fetch("/sentiment-app/analyze-request", analyze_request_options);
       })
       .then(() => {
