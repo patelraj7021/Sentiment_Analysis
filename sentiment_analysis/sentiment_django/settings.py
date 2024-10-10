@@ -76,10 +76,18 @@ WSGI_APPLICATION = 'sentiment_django.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+         'NAME':'sentiment_analysis_db',
+         'USER':'patelraj7021',
+         'PASSWORD':'2dtb$N^v7B9J',
+         'HOST':'sentiment-analysis.cz4y0quy24wh.us-east-2.rds.amazonaws.com',
+         'PORT':'5432'
+     }
 }
 
 
