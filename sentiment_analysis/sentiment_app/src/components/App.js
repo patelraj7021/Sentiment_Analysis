@@ -64,144 +64,99 @@ export default function App() {
       };
     };
 
-    let new_summary_circle_values = new Array(3);
+    const clean_top_articles_data = (data) => {
+      // add dummy articles so UI looks consistent
+      while (data.length < 4) {
+        data.push({
+          title: "-",
+          overall_rating: 50,
+          link: "/sentiment-app/",
+        });
+      }
+      return data.slice(0);
+    };
+
+    const update_UI = () => {
+      let new_summary_circle_values = new Array(3);
+      return (
+        // get today's summary value
+        fetch("/sentiment-app/summary-circle", summary_circle_options(1))
+          .then((response) => response.json())
+          .then((data) => {
+            // set today's summary value
+            new_summary_circle_values[0] = data.overall_rating;
+            // get past 3 days summary value
+            return fetch(
+              "/sentiment-app/summary-circle",
+              summary_circle_options(4)
+            );
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            // set past 3 days summary value
+            new_summary_circle_values[1] = data.overall_rating;
+            // get past 7 days summary value
+            return fetch(
+              "/sentiment-app/summary-circle",
+              summary_circle_options(8)
+            );
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            // set past 7 days summary value
+            new_summary_circle_values[2] = data.overall_rating;
+            // set state for Summary component
+            setCircleRatings(new_summary_circle_values);
+            // get articles with highest ratings in past 4 days
+            return fetch(
+              "/sentiment-app/top-articles",
+              top_articles_options("-overall_rating")
+            );
+          })
+          .then((response) => response.json())
+          // set state for articles with highest ratings
+          .then((data) => {
+            let data_cleaned = clean_top_articles_data(data);
+            setTopArticlesPos(data_cleaned);
+          })
+          .then(() => {
+            // get articles with lowest ratings in past 4 days
+            return fetch(
+              "/sentiment-app/top-articles",
+              top_articles_options("overall_rating")
+            );
+          })
+          .then((response) => response.json())
+          // set state for articles with lowest ratings
+          .then((data) => {
+            let data_cleaned = clean_top_articles_data(data);
+            setTopArticlesNeg(data_cleaned);
+          })
+          .then(() => {
+            // get historical summaries data for past 30 days
+            return fetch("/sentiment-app/historical", analyze_request_options);
+          })
+          .then((response) => response.json())
+          // set state for historical data
+          .then((data) => {
+            setHistoricalData(data);
+          })
+      );
+    };
+
     // fetch existing data for quick update
-    fetch("/sentiment-app/summary-circle", summary_circle_options(1))
-      .then((response) => response.json())
-      .then((data) => {
+    fetch("/sentiment-app/")
+      .then(() => {
         setLoading(true);
-        new_summary_circle_values[0] = data.overall_rating;
-        // update past 3 days summary circle
-        return fetch(
-          "/sentiment-app/summary-circle",
-          summary_circle_options(4)
-        );
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        new_summary_circle_values[1] = data.overall_rating;
-        // update past 7 days summary circle
-        return fetch(
-          "/sentiment-app/summary-circle",
-          summary_circle_options(8)
-        );
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        new_summary_circle_values[2] = data.overall_rating;
-        // set state for Summary component
-        setCircleRatings(new_summary_circle_values);
-        // get articles with highest ratings in past 4 days
-        return fetch(
-          "/sentiment-app/top-articles",
-          top_articles_options("-overall_rating")
-        );
-      })
-      .then((response) => response.json())
-      // set state for articles with highest ratings
-      .then((data) => {
-        while (data.length < 4) {
-          data.push({
-            title: "-",
-            overall_rating: 50,
-            link: "/sentiment-app/",
-          });
-        }
-        setTopArticlesPos(data);
       })
       .then(() => {
-        // get articles with lowest ratings in past 4 days
-        return fetch(
-          "/sentiment-app/top-articles",
-          top_articles_options("overall_rating")
-        );
-      })
-      .then((response) => response.json())
-      // set state for articles with lowest ratings
-      .then((data) => {
-        while (data.length < 4) {
-          data.push({
-            title: "-",
-            overall_rating: 50,
-            link: "/sentiment-app/",
-          });
-        }
-        setTopArticlesNeg(data);
-      })
-      .then(() => {
-        // get historical summaries data for past 30 days
-        return fetch("/sentiment-app/historical", analyze_request_options);
-      })
-      .then((response) => response.json())
-      // set state for historical data
-      .then((data) => {
-        setHistoricalData(data);
+        update_UI();
       });
 
-    // fetch articles and update again
-    fetch("/sentiment-app/") // empty call just for making button loading change work
+    // scrape and update
+    fetch("/sentiment-app/analyze-request", analyze_request_options)
       .then(() => {
-        return fetch("/sentiment-app/analyze-request", analyze_request_options);
-      })
-      .then(() => {
-        // update today summary circle
-        return fetch(
-          "/sentiment-app/summary-circle",
-          summary_circle_options(1)
-        );
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        new_summary_circle_values[0] = data.overall_rating;
-        // update past 3 days summary circle
-        return fetch(
-          "/sentiment-app/summary-circle",
-          summary_circle_options(4)
-        );
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        new_summary_circle_values[1] = data.overall_rating;
-        // update past 7 days summary circle
-        return fetch(
-          "/sentiment-app/summary-circle",
-          summary_circle_options(8)
-        );
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        new_summary_circle_values[2] = data.overall_rating;
-        // set state for Summary component
-        setCircleRatings(new_summary_circle_values);
-        // get articles with highest ratings in past 4 days
-        return fetch(
-          "/sentiment-app/top-articles",
-          top_articles_options("-overall_rating")
-        );
-      })
-      .then((response) => response.json())
-      // set state for articles with highest ratings
-      .then((data) => setTopArticlesPos(data))
-      .then(() => {
-        // get articles with lowest ratings in past 4 days
-        return fetch(
-          "/sentiment-app/top-articles",
-          top_articles_options("overall_rating")
-        );
-      })
-      .then((response) => response.json())
-      // set state for articles with lowest ratings
-      .then((data) => {
-        setTopArticlesNeg(data);
-      })
-      .then(() => {
-        // get historical summaries data for past 30 days
-        return fetch("/sentiment-app/historical", analyze_request_options);
-      })
-      .then((response) => response.json())
-      // set state for historical data
-      .then((data) => {
-        setHistoricalData(data);
+        update_UI();
       })
       .then(() => {
         setLoading(false);

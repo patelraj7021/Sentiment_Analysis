@@ -105,3 +105,14 @@ def should_abort_request(request):
 PLAYWRIGHT_ABORT_REQUEST = should_abort_request
 
 LOG_ENABLED = False
+
+COOKIES_ENABLED = False
+
+# rotate user agents
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware': 500,
+}
+
+with open('user_agents.log', 'r') as file:
+    USER_AGENTS = file.read().split('\n')
