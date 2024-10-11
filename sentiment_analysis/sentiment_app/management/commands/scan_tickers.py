@@ -7,7 +7,8 @@ class Command(BaseCommand):
     help = 'Scrapes and analyzes articles for the predefined list of tickers to update everyday'
     
     def handle(self, *args, **kwargs):
-        tickers = ['NVDA', 'AMD', 'AAPL']
+        with open('sp500_tickers.csv', 'r') as file:
+            tickers = file.read().split('\n')
         for ticker in tickers:
             # crawl articles
             data_filepath = crawling_wrapper(ticker)
@@ -31,3 +32,5 @@ class Command(BaseCommand):
                                                   neg_score=article_analysis.neg_score,
                                                   overall_rating=article_analysis.overall_rating)
                             new_record.save()
+            with open('completed_tickers.log', 'a') as file:
+                file.write(ticker + '\n')

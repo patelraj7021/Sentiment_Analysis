@@ -20,7 +20,8 @@ class ArticleTextSpider(scrapy.Spider):
         self.start_url = url_in
     
     def start_requests(self):
-        yield scrapy.Request(self.start_url, meta={'playwright': True})
+        yield scrapy.Request(self.start_url,
+                             meta={'playwright': True})
            
     def parse(self, response):
         # crawl through Yahoo main ticker page to get links for recent articles
@@ -31,7 +32,8 @@ class ArticleTextSpider(scrapy.Spider):
         with open('links.log', 'w') as file:
             for link in recent_news_links:
                 file.write(link + '\n')
-                yield scrapy.Request(link, callback=self.article_parse, 
+                yield scrapy.Request(link, 
+                                     callback=self.article_parse, 
                                      meta={'playwright': True})
                 
     def article_parse(self, response):

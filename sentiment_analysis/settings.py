@@ -24,18 +24,18 @@ DOWNLOAD_HANDLERS = {
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 16
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -106,12 +106,15 @@ PLAYWRIGHT_ABORT_REQUEST = should_abort_request
 
 LOG_ENABLED = False
 
-COOKIES_ENABLED = False
+# to activate proxies
+# SCRAPEOPS_API_KEY = 'YOUR_API_KEY' # can get API KEY from scrapeops website
+# SCRAPEOPS_PROXY_ENABLED = True
 
-# rotate user agents
+# rotate user agents 
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    'scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware': 500,
+    'scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware': None, # 500 to activate
+    'scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk': None, # 725 to activate
 }
 
 with open('user_agents.log', 'r') as file:

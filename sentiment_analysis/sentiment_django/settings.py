@@ -75,6 +75,11 @@ WSGI_APPLICATION = 'sentiment_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+with open('aws_rds_login.log', 'r') as file:
+    file_contents = file.read().split('\n')
+    rds_username = file_contents[0]
+    rds_password = file_contents[1]
+
 DATABASES = {
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -83,8 +88,8 @@ DATABASES = {
     'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'NAME':'sentiment_analysis_db',
-         'USER':'patelraj7021',
-         'PASSWORD':'2dtb$N^v7B9J',
+         'USER': f'{rds_username}',
+         'PASSWORD': f'{rds_password}',
          'HOST':'sentiment-analysis.cz4y0quy24wh.us-east-2.rds.amazonaws.com',
          'PORT':'5432'
      }
