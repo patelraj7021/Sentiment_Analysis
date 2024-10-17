@@ -23,9 +23,9 @@ def create_pos_word_embeddings():
                  'optimistic',
                  'hopeful'
                  ]
-    pos_sequences, pos_model, pos_embeddings = a_m.embed_sequences(pos_words)
+    pos_embeddings = a_m.embed_sequences(pos_words)
     
-    return pos_sequences, pos_model, pos_embeddings
+    return pos_embeddings
 
 
 @pytest.fixture
@@ -34,9 +34,9 @@ def create_neg_word_embeddings():
     neg_words = ['negative',  
                  'pessimistic',
                  'cautious']
-    neg_sequences, neg_model, neg_embeddings = a_m.embed_sequences(neg_words)
+    neg_embeddings = a_m.embed_sequences(neg_words)
     
-    return neg_sequences, neg_model, neg_embeddings
+    return neg_embeddings
 
 
 def dot_product_identity_comparison(embeddings):
@@ -81,8 +81,8 @@ class TestEmbeddingComparison:
                                  create_neg_word_embeddings):
         # dot product value should be highest when
         # a vector is compared to itself
-        pos_sequences, pos_model, pos_embeddings = create_pos_word_embeddings
-        neg_sequences, neg_model, neg_embeddings = create_neg_word_embeddings
+        pos_embeddings = create_pos_word_embeddings
+        neg_embeddings = create_neg_word_embeddings
         
         pos_result = dot_product_identity_comparison(pos_embeddings)
         neg_result = dot_product_identity_comparison(neg_embeddings)
@@ -94,8 +94,8 @@ class TestEmbeddingComparison:
         # dot product values should be lower for vectors
         # belonging to the opposite class of sentiment
         # min(same class prod) > max(opposite class prod)
-        pos_sequences, pos_model, pos_embeddings = create_pos_word_embeddings
-        neg_sequences, neg_model, neg_embeddings = create_neg_word_embeddings
+        pos_embeddings = create_pos_word_embeddings
+        neg_embeddings = create_neg_word_embeddings
         
         pos_test = dot_product_differing_comparision(pos_embeddings, neg_embeddings)
         neg_test = dot_product_differing_comparision(neg_embeddings, pos_embeddings)

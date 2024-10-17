@@ -15,10 +15,9 @@ from article_record_class import ArticleRecord
 import re
 import subprocess
 
-
     
 def embed_sequences(input_seqs):   
-    # initialize transformer
+    # initialize transformer and model
     pretrained_name = "distilbert-base-uncased-finetuned-sst-2-english"
     tokenizer = DistilBertTokenizer.from_pretrained(pretrained_name,
                                                     clean_up_tokenization_spaces=True)
@@ -33,21 +32,41 @@ def embed_sequences(input_seqs):
     model_out = model(**sequences)
     embeddings = model_out.hidden_states[-1]
     
-    return sequences, model_out, embeddings
+    return embeddings
 
 
-def compare_text(embeddings):
+def batched_compare_text(batched_text):
     # bag of positive sentiment words to compare against
     pos_words = ['positive',
                  'optimistic',
                  'hopeful']
-    pos_sequences, pos_model, pos_embeddings = embed_sequences(pos_words)
+    pos_embeddings = embed_sequences(pos_words)
     
     # bag of negative sentiment words, must be same num as pos_words
     neg_words = ['negative',  
                  'pessimistic',
                  'cautious']
-    neg_sequences, neg_model, neg_embeddings = embed_sequences(neg_words)
+    neg_embeddings = embed_sequences(neg_words)
+    
+    all_pos_scores = []
+    all_neg_scores = []
+    for batch in batched_text:
+        embeddings = embed_sequences(batch)
+        pos_scores, neg_scores = compare_text(embeddings, 
+                                              pos_embeddings, neg_embeddings)
+        # embeddings can take up a large amount of memory
+        del embeddings 
+        all_pos_scores = all_pos_scores + pos_scores
+        all_neg_scores = all_neg_scores + neg_scores
+    article_mean_pos_score = np.mean(all_pos_scores)
+    article_mean_neg_score = np.mean(all_neg_scores)
+    # embeddings can take up a large amount of memory
+    del pos_embeddings
+    del neg_embeddings
+    return article_mean_pos_score, article_mean_neg_score
+
+
+def compare_text(embeddings, pos_embeddings, neg_embeddings):
 
     num_sentences = embeddings.shape[0]
     num_comp_words = pos_embeddings.shape[0]
@@ -71,12 +90,22 @@ def compare_text(embeddings):
             # save pos/neg scores compared to each word for sentence
             pos_scores_sentence.append(pos_score_sentence)
             neg_scores_sentence.append(neg_score_sentence)
-        # save mean of sentence score vs each pos/neg word
+        # save mean of sentence vs each pos/neg word
         pos_scores.append(np.mean(pos_scores_sentence))
         neg_scores.append(np.mean(neg_scores_sentence))
 
-    # return mean of pos and neg scores for each sentence
-    return np.mean(pos_scores), np.mean(neg_scores)
+    # return pos and neg scores for each sentence
+    return pos_scores, neg_scores
+
+
+def batch_text(text, num_in_batch):
+    start = 0
+    end = len(text)
+    step = num_in_batch
+    batched_list = []
+    for i in range(start, end, step):
+        batched_list.append(text[i:i+step])
+    return batched_list
 
 
 def analyze_article(data_input, ticker):
@@ -86,15 +115,15 @@ def analyze_article(data_input, ticker):
     article_title = data_input[2]
     # split each sentence on punctuation
     text = [article_title] + re.split(r'[!.?]\s*', data_input[3])
-    if len(text) < 5:
+    if len(text) < 7:
         # some articles have a paywall that only shows first few sentences
         # don't include these in analysis
         print('Skipped paywalled article')
         return None 
-    sequences, model_output, embeddings = embed_sequences(text)
-    article_pos_score, article_neg_score = compare_text(embeddings)
-    # relative comparison between pos and neg score
-    article_pos_neg_frac = int(article_pos_score * 100 / (article_pos_score+article_neg_score))
+    # batch text
+    num_in_batch = 10
+    batched_text = batch_text(text, num_in_batch)
+    article_pos_score, article_neg_score = batched_compare_text(batched_text)
     new_record = ArticleRecord(ticker, 
                                title=article_title, 
                                date=article_date,

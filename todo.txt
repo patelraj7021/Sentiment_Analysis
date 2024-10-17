@@ -1,6 +1,4 @@
 analysis:
-- remove lower bound of 0 on pos/neg scores
-- make score values float instead of int
 - integrate z-score comparisons instead of raw scores
 
 data:
@@ -8,10 +6,13 @@ data:
 
 UI:
 - make list for tickers
-- make enter work as button press
+- make 'enter' work as button press
+- make app have scroll bars if window size is too low
 
 scraping:
 - make scraping start at random time within set window
 - wait random period of time between tickers
+- account scan_tickers crashing
 
 testing and documentation
+- separate folder structure to be easier to follow (i.e., spider folder, django folder, etc.)
