@@ -1,0 +1,17 @@
+analysis:
+- remove lower bound of 0 on pos/neg scores
+- make score values float instead of int
+- integrate z-score comparisons instead of raw scores
+
+data:
+- build database so analysis can have enough data for means to be meaningful
+
+UI:
+- make list for tickers
+- make enter work as button press
+
+scraping:
+- make scraping start at random time within set window
+- wait random period of time between tickers
+
+testing and documentation

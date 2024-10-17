@@ -29,6 +29,8 @@ class ArticleTextSpider(scrapy.Spider):
         recent_news_links = response \
             .xpath('//section[@data-testid="storyitem"]/a/@href').getall()
         # store links
+        num_links = len(recent_news_links)
+        print(str(num_links) + ' articles found...')
         with open('links.log', 'w') as file:
             for link in recent_news_links:
                 file.write(link + '\n')
@@ -56,3 +58,4 @@ class ArticleTextSpider(scrapy.Spider):
                        response.url + ' \n' +
                        raw_title + '\n' +
                        text)
+        print('Scraped article successfully')

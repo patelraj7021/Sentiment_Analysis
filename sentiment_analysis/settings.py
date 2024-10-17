@@ -112,7 +112,7 @@ LOG_ENABLED = False
 
 # rotate user agents 
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500, # alternate with the next line
     'scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware': None, # 500 to activate
     'scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk': None, # 725 to activate
 }
