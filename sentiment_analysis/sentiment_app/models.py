@@ -7,7 +7,7 @@ import random
 class Summaries(models.Model):
     ticker = models.CharField(max_length=8)
     date = models.DateField()
-    overall_rating = models.IntegerField(null=True)
+    overall_rating = models.FloatField(null=True)
     
     
 class Articles(models.Model):
@@ -15,6 +15,6 @@ class Articles(models.Model):
     date = models.DateField()
     title = models.CharField(max_length=255)
     link = models.CharField(max_length=255)
-    pos_score = models.IntegerField(null=True)
-    neg_score = models.IntegerField(null=True)
-    overall_rating = models.IntegerField(null=True)
+    pos_score = models.FloatField(null=True)
+    neg_score = models.FloatField(null=True)
+    overall_rating = models.FloatField(null=True)

@@ -65,10 +65,9 @@ def compare_text(embeddings):
             norm_neg_embedding = normalize(neg_embeddings[j, 0, :], dim=0)
             norm_sent_embedding = normalize(embeddings[i, 0, :], dim=0)
             # comparison score is relative to highest possible for a word
-            # highest possible is word dot product with itself
-            # lowest allowed score is 0
-            pos_score_sentence = max(int(pt.dot(norm_sent_embedding, norm_pos_embedding).item()*100), 0)
-            neg_score_sentence = max(int(pt.dot(norm_sent_embedding, norm_neg_embedding).item()*100), 0)
+            # highest possible is word dot product with itself, i.e., 1.0
+            pos_score_sentence = pt.dot(norm_sent_embedding, norm_pos_embedding).item()
+            neg_score_sentence = pt.dot(norm_sent_embedding, norm_neg_embedding).item()
             # save pos/neg scores compared to each word for sentence
             pos_scores_sentence.append(pos_score_sentence)
             neg_scores_sentence.append(neg_score_sentence)
@@ -102,7 +101,9 @@ def analyze_article(data_input, ticker):
                                link=article_link,
                                pos_score=article_pos_score,
                                neg_score=article_neg_score,
-                               overall_rating=article_pos_neg_frac)
+                               # overall_rating will be calculated in the django view later
+                               # it depends on aggregrate score values that aren't accessible here
+                               overall_rating=0.0) 
 
     return new_record
 
