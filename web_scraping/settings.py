@@ -24,7 +24,7 @@ DOWNLOAD_HANDLERS = {
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -35,7 +35,7 @@ DOWNLOAD_DELAY = 3
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = True
+COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -112,10 +112,12 @@ LOG_ENABLED = False
 
 # rotate user agents 
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500, # alternate with the next line
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None, # alternate with the next line
     'scrapy_useragents.downloadermiddlewares.useragents.UserAgentsMiddleware': None, # 500 to activate
     'scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk': None, # 725 to activate
 }
+
+USER_AGENT = 'Googlebot/2.1 (+http://www.google.com/bot.html)'
 
 with open('user_agents.log', 'r') as file:
     USER_AGENTS = file.read().split('\n')
