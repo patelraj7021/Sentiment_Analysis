@@ -22,7 +22,7 @@ class Command(BaseCommand):
         print(str(len(tickers_queue)) + ' tickers added to queue')
         while len(tickers_queue) > 0:
             # sleep a random amount of time before each ticker is processed
-            wait_time = randint(1, 60)
+            wait_time = randint(1, 30)
             print('Waiting for ' + str(wait_time) + ' seconds...')
             sleep(wait_time)
             # pick a random ticker from the queue
