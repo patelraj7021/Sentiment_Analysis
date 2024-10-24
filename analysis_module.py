@@ -118,8 +118,7 @@ def analyze_article(data_input, ticker):
     if len(text) < 7:
         # some articles have a paywall that only shows first few sentences
         # don't include these in analysis
-        print('Skipped paywalled article')
-        return None 
+        raise RuntimeError('Skipping article: not enough data')
     # batch text
     num_in_batch = 10
     batched_text = batch_text(text, num_in_batch)

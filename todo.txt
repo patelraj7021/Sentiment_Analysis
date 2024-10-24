@@ -14,4 +14,8 @@ UI:
 scraping:
 - make scraping start at random time within set window
 
+docker:
+- optimize image size
+- include install for rust and npm
+
 testing and documentation

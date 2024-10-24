@@ -8,9 +8,10 @@ from .serializers import AnalyzeRequestSerializer, SummariesSerializer, \
     ArticlesSerializer, TopArticlesSerializer, SummaryCircleSerializer
 from .models import Summaries, Articles
 from datetime import datetime, timedelta
-import sys
-sys.path.append('../sentiment_analysis')
-from analysis_module import crawling_wrapper, analyze_article
+# import sys
+# sys.path.append('../sentiment_analysis')
+# from analysis_module import crawling_wrapper, analyze_article
+from query_ticker import query_ticker
 import numpy as np
 import os
 
@@ -42,29 +43,11 @@ class AnalyzeRequestView(APIView):
             ticker = serializer.data.get('ticker')
             # current_date = datetime.today().strftime('%Y-%m-%d')
             current_date = datetime.today()
-            # run crawling
-            data_filepath = crawling_wrapper(ticker)
-            # loop through scraped articles for Articles table
-            for article_file in os.listdir(data_filepath):
-                with open(os.path.join(data_filepath, article_file), 'r') as file:
-                    data_input = file.read().split('\n')
-                    # get link from article data file
-                    article_link = data_input[1]
-                    # search if article already exists in database
-                    # from previous analysis runs
-                    query = Articles.objects.filter(link=article_link, ticker=ticker)
-                    if not query.exists():                   
-                        # only run analysis if it doesn't
-                        article_analysis = analyze_article(data_input, ticker)
-                        if article_analysis is not None:
-                            new_record = Articles(ticker=ticker, 
-                                                title=article_analysis.title,
-                                                date=article_analysis.date,
-                                                link=article_analysis.link,
-                                                pos_score=article_analysis.pos_score,
-                                                neg_score=article_analysis.neg_score,
-                                                overall_rating=article_analysis.overall_rating)
-                            new_record.save()
+            
+            try:
+                query_ticker(ticker)
+            except:
+                return Response(status=status.HTTP_417_EXPECTATION_FAILED)
             
             # average over the ratings of articles from past 3 days for Summaries table   
             past_3days_articles = Articles.objects.filter(date__range=[current_date-timedelta(days=4),

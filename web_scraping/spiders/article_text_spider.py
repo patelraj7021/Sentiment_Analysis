@@ -41,14 +41,23 @@ class ArticleTextSpider(scrapy.Spider):
         # crawl through article page to get text
         # get title
         raw_title = response.xpath('//h1[@data-test-locator="headline"]/text()').get()
+        # the identifier for the title is different for some Yahoo articles 
+        if raw_title is None:
+            raw_title = response.xpath('//h1[@class="cover-title yf-j1dsr3"]/text()').get()
         # need a no spaces, no spec. chars. version of title for file naming
         cleaned_title = re.sub(r'\s+', '_', raw_title)
         cleaned_title = re.sub(r'\W+', '', cleaned_title)
         # get date
         datetime = response.xpath('//div[@class="caas-attr-time-style"]/time/@datetime').get()
+        # the identifier for datetime is different sometimes too
+        if datetime is None:
+            datetime = response.xpath('//div[@class="byline-attr-time-style"]/time/@datetime').get()
         date = datetime.split('T')[0]
         # get text
         text = response.xpath('//div[@class="caas-body"]//text()').extract()
+        # different identifier for text as well
+        if text is None or len(text) == 0:
+            text = response.xpath('//div[@class="body yf-5ef8bf"]//text()').extract()
         text = ' '.join(text)
         text_filepath = os.path.join('article_temp_files', 
                                      cleaned_title + '.log')

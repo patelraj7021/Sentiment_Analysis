@@ -5,3 +5,4 @@ testing.py
 article_temp_files
 sentiment-app-server-keypair.pem:Zone.Identifier
 sp500_tickers.csv
+requirements_gpu.txt
